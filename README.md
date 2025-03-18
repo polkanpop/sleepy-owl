@@ -28,16 +28,16 @@ activate the virtual environment. The .yaml file already has all the dependencie
 
 ### Database setup
 
-Make sure that your MySQL service is running and you are in the "mememonize-env" anaconda virtual environment
-
-```cd backend ```
-```python init_db.py```
-
 Then edit your the backend/.env to your MySQL credentials
 ```DATABASE_URL=mysql+pymysql://root:password@localhost/mememonize```
 
 ```root```: Your username   
 ```password```: Your password
+
+Make sure that your MySQL service is running and you are in the "mememonize-env" anaconda virtual environment
+
+```cd backend ```
+```python init_db.py```
 
 ### Start Ganache UI:
 Start the Ganache UI 
