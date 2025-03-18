@@ -54,17 +54,17 @@ New workspace and import the truffle.config file in /smart-contracts
 
 #### Install the Meta Mask extension on your browser and make an account.
 Add a custom network
-    - Network name: Ganache
-    - Default RPC URL: RPC URL in Ganache UI
-    - Chain ID: 1337
-    - Currency symbol: ETH
+- Network name: Ganache
+- Default RPC URL: RPC URL in Ganache UI
+- Chain ID: 1337
+- Currency symbol: ETH
 
 Select that network
 Add account 
-    - Import account
-    - Copy the private key of one of the accounts in the local blockchain on Ganache
-    - Paste it
-    - If it ask to connect to localhost:5173, accept the connection.
+- Import account
+- Copy the private key of one of the accounts in the local blockchain on Ganache
+- Paste it
+- If it ask to connect to localhost:5173, accept the connection.
 
 
 Everything should work according to the video Demo now.
