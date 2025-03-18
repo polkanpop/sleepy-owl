@@ -29,7 +29,7 @@ Make sure that your MySQL service is running and you are in the "mememonize-env"
 Then edit your the backend/.env to your MySQL credentials
 ```DATABASE_URL=mysql+pymysql://root:password@localhost/mememonize```
 
-```root```: Your username
+```root```: Your username   
 ```password```: Your password
 
 ### Start Ganache UI:
