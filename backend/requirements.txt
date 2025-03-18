@@ -1,0 +1,8 @@
+Install these dependencies using "conda install"
+
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+dotenv
+web3

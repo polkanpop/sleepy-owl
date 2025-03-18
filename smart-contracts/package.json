@@ -1,0 +1,19 @@
+{
+  "name": "mememonize-trading-smart-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Mememonize Trading platform",
+  "main": "truffle-config.js",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@truffle/hdwallet-provider": "^2.1.15"
+  },
+  "devDependencies": {
+    "truffle": "^5.11.5"
+  }
+}
+
