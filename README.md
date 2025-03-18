@@ -52,7 +52,15 @@ New workspace and import the truffle.config file in /smart-contracts
 
 ### Connect local blockchain to MetaMask
 
-#### Install the Meta Mask extension on your browser and make an account.
+#### Install the Meta Mask extension on your browser and add an account.
+
+When first starting Meta Mask it will ask you to add an account, click on import and
+import the 12 mnemonic on the Ganache blockchain.  
+  
+  
+Then  
+  
+  
 Add a custom network
 - Network name: Ganache
 - Default RPC URL: RPC URL in Ganache UI
@@ -60,7 +68,7 @@ Add a custom network
 - Currency symbol: ETH
 
 Select that network
-Add account 
+Add two or more accounts to Meta Mask
 - Import account
 - Copy the private key of one of the accounts in the local blockchain on Ganache
 - Paste it
