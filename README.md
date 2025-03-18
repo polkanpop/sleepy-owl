@@ -12,7 +12,7 @@ A decentralized trading system for digital assets.
 
 ### Anaconda Setup
 
-import the "mememonize-env.yaml" environment to anaconda
+import the "mememonize-env.yaml" environment to anaconda and 
 activate the virtual environment.
 
 ### Run the setup script
