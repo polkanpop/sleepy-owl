@@ -8,12 +8,19 @@ A decentralized trading system for digital assets.
 - MySQL
 - Ganache (for local blockchain)
 - Anaconda
-## Setup
+## Backend dependencies
+- Anaconda (Manage packages and environments)
+- FastAPI
+- Uvicorn
+- SQLAlchemy
+- pymysql
+
+Using Anaconda, please install the dependencies to your anaconda virtual environment.
 
 ### Anaconda Setup
 
-import the "mememonize-env.yaml" environment to anaconda and 
-activate the virtual environment.
+You can import the "mememonize-env.yaml" environment to anaconda and 
+activate the virtual environment. The .yaml file already has all the dependencies installed.
 
 ### Run the setup script
 
