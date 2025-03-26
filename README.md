@@ -46,6 +46,7 @@ New workspace and import the truffle.config file in /smart-contracts
 ```cd smart-contracts && truffle migrate```
     - Change the "CONTRACT_ADDRESS" variable in .env to the contract address after truffle migrate.
 ### Start backend (after activating anaconda virtual environment): 
+```python event_listener.py```
 ```uvicorn main:app --reload```
 ### Start frontend: 
 ```cd frontend && npm run dev```
