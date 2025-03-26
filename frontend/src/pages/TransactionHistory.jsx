@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Typography, Box, CircularProgress, Alert, Snackbar, Tabs, Tab } from "@mui/material"
+import { Container, Typography, Box, CircularProgress, Alert, Snackbar } from "@mui/material"
 import TransactionTable from "../components/TransactionTable"
 import { transactionsApi } from "../services/api"
 import web3Service from "../services/web3"
@@ -10,7 +10,6 @@ function TransactionHistory() {
   const [transactions, setTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [tabValue, setTabValue] = useState(0)
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" })
   const [web3Initialized, setWeb3Initialized] = useState(false)
 
@@ -58,9 +57,6 @@ function TransactionHistory() {
     fetchTransactions()
   }, [])
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue)
-  }
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false })
@@ -78,14 +74,6 @@ function TransactionHistory() {
     })
   }
 
-  // Filter transactions based on tab
-  const filteredTransactions = transactions.filter((transaction) => {
-    if (tabValue === 0) return true // All transactions
-    if (tabValue === 1) return transaction.status === "completed"
-    if (tabValue === 2) return transaction.status === "pending"
-    if (tabValue === 3) return transaction.status === "cancelled"
-    return true
-  })
 
   return (
     <Container maxWidth="lg">
@@ -93,14 +81,6 @@ function TransactionHistory() {
         Transaction History
       </Typography>
 
-      <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="transaction tabs">
-          <Tab label="All" />
-          <Tab label="Completed" />
-          <Tab label="Pending" />
-          <Tab label="Cancelled" />
-        </Tabs>
-      </Box>
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
@@ -115,7 +95,7 @@ function TransactionHistory() {
           Please connect to MetaMask to complete transactions.
         </Alert>
       ) : (
-        <TransactionTable transactions={filteredTransactions} onTransactionUpdate={handleTransactionUpdate} />
+        <TransactionTable transactions={transactions} onTransactionUpdate={handleTransactionUpdate} />
       )}
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>

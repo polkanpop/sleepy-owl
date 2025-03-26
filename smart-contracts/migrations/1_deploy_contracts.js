@@ -1,20 +1,20 @@
-const MememonizeEscrow = artifacts.require("MememonizeEscrow");
+const MememonizeNFT = artifacts.require("MememonizeNFT");
 const fs = require('fs');
 const path = require('path');
 
 module.exports = async (deployer, network, accounts) => {
   // Deploy the contract
-  await deployer.deploy(MememonizeEscrow);
+  await deployer.deploy(MememonizeNFT);
   
   // Get the deployed contract instance
-  const escrowInstance = await MememonizeEscrow.deployed();
+  const nftInstance = await MememonizeNFT.deployed();
   
-  console.log(`Contract deployed at address: ${escrowInstance.address}`);
+  console.log(`Contract deployed at address: ${nftInstance.address}`);
   
   // Update the contract address in the frontend
   try {
     // Get the contract JSON
-    const contractJson = require('../build/contracts/MememonizeEscrow.json');
+    const contractJson = require('../build/contracts/MememonizeNFT.json');
     
     // Copy the contract JSON to the frontend
     const frontendContractsDir = path.resolve(__dirname, '../../frontend/src/contracts');
@@ -26,7 +26,7 @@ module.exports = async (deployer, network, accounts) => {
     
     // Write the contract JSON to the frontend
     fs.writeFileSync(
-      path.resolve(frontendContractsDir, 'MememonizeEscrow.json'),
+      path.resolve(frontendContractsDir, 'MememonizeNFT.json'),
       JSON.stringify(contractJson, null, 2)
     );
     

@@ -22,7 +22,7 @@ import {
 } from "@mui/material"
 import AssetDetailCard from "../components/AssetDetailCard"
 import { assetsApi, transactionsApi, usersApi } from "../services/api"
-import web3Service from "../services/web3"
+import web3 from "../services/web3" // Updated import to match actual file: web3.js
 
 function AssetDetails() {
   const { id } = useParams()
@@ -45,7 +45,7 @@ function AssetDetails() {
   useEffect(() => {
     const initWeb3 = async () => {
       try {
-        await web3Service.initWeb3()
+        await web3.initWeb3()
         setWeb3Initialized(true)
       } catch (err) {
         console.error("Error initializing web3:", err)
@@ -105,15 +105,19 @@ function AssetDetails() {
 
     try {
       // First, interact with the blockchain
-      const account = await web3Service.getCurrentAccount()
+      const account = await web3.getCurrentAccount()
 
-      // Purchase the asset on the blockchain
-      const result = await web3Service.purchaseAsset(asset.token_id, asset.price)
+      // Convert the asset price (in ETH) to wei before sending the transaction
+      const weiPrice = web3.web3.utils.toWei(asset.price.toString(), "ether")
+
+      // Purchase the asset on the blockchain by calling purchaseAsset with tokenId and sale price
+      const result = await web3.purchaseAsset(asset.token_id, weiPrice)
 
       setTransactionHash(result.transactionHash)
 
-      // Get the transaction ID from the blockchain result
-      const blockchainTransactionId = result.events?.AssetPurchased?.returnValues?.transactionId || "1"
+      // Extract the tokenId from the NFTPurchased event (Note: our event does not include a separate transactionId)
+      const blockchainTransactionId =
+        result.events?.NFTPurchased?.returnValues?.tokenId || asset.token_id
       setTransactionId(blockchainTransactionId)
 
       setBlockchainSuccess(true)
@@ -202,7 +206,7 @@ function AssetDetails() {
       }
 
       // Complete the transaction on the blockchain
-      const result = await web3Service.completeTransaction(transactionId)
+      const result = await web3.completeTransaction(transactionId)
 
       // Update the transaction status in the database
       try {

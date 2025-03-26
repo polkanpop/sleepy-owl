@@ -1,4 +1,3 @@
-Install these dependencies using "conda install"
 
 fastapi
 uvicorn

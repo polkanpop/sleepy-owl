@@ -7,6 +7,7 @@ import Marketplace from "./pages/Marketplace"
 import AssetDetails from "./pages/AssetDetails"
 import TransactionHistory from "./pages/TransactionHistory"
 import ListAsset from "./pages/ListAsset"
+import MyAssets from "./pages/MyAssets"
 import NotFound from "./pages/NotFound"
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/asset/:id" element={<AssetDetails />} />
           <Route path="/transactions" element={<TransactionHistory />} />
           <Route path="/list-asset" element={<ListAsset />} />
+          <Route path="/my-assets" element={<MyAssets />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Container>

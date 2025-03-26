@@ -56,94 +56,42 @@ def create_transaction(transaction: schemas.TransactionCreate, db: Session = Dep
         if asset is None:
             raise HTTPException(status_code=404, detail="Asset not found")
         
-        # Get or create buyer and seller users if IDs are not provided
-        if not transaction.buyer_id or not transaction.seller_id:
-            # If buyer_id is not provided but buyer_address is
-            if hasattr(transaction, 'buyer_address') and transaction.buyer_address:
-                buyer = get_or_create_user(transaction.buyer_address, db)
-                transaction.buyer_id = buyer.id
-            else:
-                # Create a default buyer if none provided
-                buyer = get_or_create_user("0x0000000000000000000000000000000000000001", db)
-                transaction.buyer_id = buyer.id
-            
-            # If seller_id is not provided but we have the asset owner
-            if asset.owner_address:
-                seller = get_or_create_user(asset.owner_address, db)
-                transaction.seller_id = seller.id
-            else:
-                # Create a default seller if none provided
-                seller = get_or_create_user("0x0000000000000000000000000000000000000002", db)
-                transaction.seller_id = seller.id
+        # Require buyer address from the request
+        if not hasattr(transaction, 'buyer_address') or not transaction.buyer_address:
+            raise HTTPException(status_code=400, detail="buyer_address is required")
         
-        # Create transaction
-        transaction_dict = transaction.dict()
-        # Remove any extra fields that aren't in the model
-        if 'buyer_address' in transaction_dict:
-            transaction_dict.pop('buyer_address')
-        if 'seller_address' in transaction_dict:
-            transaction_dict.pop('seller_address')
+        # Get or create buyer using provided buyer_address
+        buyer = get_or_create_user(transaction.buyer_address, db)
+        transaction.buyer_id = buyer.id
+
+        # Use asset.owner_address as seller address; if missing, throw error.
+        if asset.owner_address:
+            seller = get_or_create_user(asset.owner_address, db)
+            transaction.seller_id = seller.id
+        else:
+            raise HTTPException(status_code=400, detail="Asset owner address is missing; cannot determine seller")
+        
+        # Exclude any provided 'status', 'buyer_address', and 'seller_address'
+        # and set the status to "pending" to await on-chain confirmation.
+        transaction_dict = transaction.dict(exclude={"status", "buyer_address", "seller_address"})
+        transaction_dict["status"] = "pending"
             
         db_transaction = models.Transaction(**transaction_dict)
         db.add(db_transaction)
         
-        # Update asset availability if needed
-        if transaction.status != "cancelled":
-            asset.is_available = False
+        # Mark asset as sold (not available) as purchase initiation (final confirmation will be handled via blockchain event)
+        asset.is_available = False
         
         db.commit()
         db.refresh(db_transaction)
         return db_transaction
-    except HTTPException:
+    except HTTPException as he:
         db.rollback()
-        raise
+        raise he
     except Exception as e:
         db.rollback()
         print(f"Error in create_transaction: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-@router.put("/{transaction_id}/status", response_model=schemas.Transaction)
-def update_transaction_status(transaction_id: int, status: str, db: Session = Depends(get_db)):
-    try:
-        transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
-        if transaction is None:
-            raise HTTPException(status_code=404, detail="Transaction not found")
-        
-        if status not in ["pending", "completed", "cancelled"]:
-            raise HTTPException(status_code=400, detail="Invalid status")
-        
-        # Update transaction status
-        transaction.status = status
-        
-        # Handle asset ownership transfer if transaction is completed
-        if status == "completed":
-            asset = db.query(models.Asset).filter(models.Asset.id == transaction.asset_id).first()
-            if asset:
-                # Get buyer's wallet address
-                buyer = db.query(models.User).filter(models.User.id == transaction.buyer_id).first()
-                if buyer:
-                    # Transfer ownership to buyer
-                    asset.owner_address = buyer.wallet_address
-                    # Make asset available again (now owned by the buyer)
-                    asset.is_available = True
-                    print(f"Asset {asset.id} ownership transferred to {buyer.wallet_address}")
-        
-        # If cancelled, make asset available again
-        elif status == "cancelled":
-            asset = db.query(models.Asset).filter(models.Asset.id == transaction.asset_id).first()
-            if asset:
-                asset.is_available = True
-        
-        db.commit()
-        db.refresh(transaction)
-        return transaction
-    except HTTPException:
-        db.rollback()
-        raise
-    except Exception as e:
-        db.rollback()
-        print(f"Error in update_transaction_status: {str(e)}")
-        print(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 

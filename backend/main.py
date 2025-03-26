@@ -15,12 +15,20 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Mememonize Trading API")
 
-# Configure CORS - Updated to be more permissive
+# Define allowed origins
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+# Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Vite's default port
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly allow all methods
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )

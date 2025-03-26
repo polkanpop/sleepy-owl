@@ -1,8 +1,8 @@
 import Web3 from "web3"
-import MememonizeEscrowABI from "../contracts/MememonizeEscrow.json"
+import MememonizeNFTABI from "../contracts/MememonizeNFT.json"
 
 let web3
-let escrowContract
+let nftContract
 
 // Initialize Web3
 export const initWeb3 = async () => {
@@ -21,37 +21,37 @@ export const initWeb3 = async () => {
         const data = await response.json()
 
         if (data.address) {
-          escrowContract = new web3.eth.Contract(MememonizeEscrowABI.abi, data.address)
-          return { web3, escrowContract }
+          nftContract = new web3.eth.Contract(MememonizeNFTABI.abi, data.address)
+          return { web3, nftContract }
         }
       } catch (error) {
         console.warn("Could not fetch contract address from backend, falling back to local ABI")
       }
 
       // Fallback to ABI networks if backend fails
-      const deployedNetwork = MememonizeEscrowABI.networks[networkId]
+      const deployedNetwork = MememonizeNFTABI.networks[networkId]
 
       if (deployedNetwork) {
-        escrowContract = new web3.eth.Contract(MememonizeEscrowABI.abi, deployedNetwork.address)
+        nftContract = new web3.eth.Contract(MememonizeNFTABI.abi, deployedNetwork.address)
 
-        return { web3, escrowContract }
+        return { web3, nftContract }
       } else {
         console.error("Contract not deployed on the current network")
-        return { web3, escrowContract: null }
+        return { web3, nftContract: null }
       }
     } catch (error) {
       console.error("User denied account access", error)
-      return { web3: null, escrowContract: null }
+      return { web3: null, nftContract: null }
     }
   } else if (window.web3) {
     // Legacy dapp browsers
     web3 = new Web3(window.web3.currentProvider)
-    return { web3, escrowContract: null }
+    return { web3, nftContract: null }
   } else {
     // Fallback to local provider
-    const provider = new Web3.providers.HttpProvider("http://localhost:8545")
+    const provider = new Web3.providers.HttpProvider("http://localhost:7545")
     web3 = new Web3(provider)
-    return { web3, escrowContract: null }
+    return { web3, nftContract: null }
   }
 }
 
@@ -62,114 +62,159 @@ export const getCurrentAccount = async () => {
   return accounts[0]
 }
 
-// List an asset
-export const listAsset = async (name, price) => {
-  if (!escrowContract) await initWeb3()
-  const account = await getCurrentAccount()
-
-  const priceWei = web3.utils.toWei(price.toString(), "ether")
-
-  return escrowContract.methods.listAsset(name, priceWei).send({ from: account })
-}
-
-// Purchase an asset
-export const purchaseAsset = async (assetId, price) => {
-  if (!escrowContract) await initWeb3()
-  const account = await getCurrentAccount()
-
-  const priceWei = web3.utils.toWei(price.toString(), "ether")
-
-  return escrowContract.methods.purchaseAsset(assetId).send({ from: account, value: priceWei })
-}
-const listenForTransactionCompletion = (transactionHash) => {
-  escrowContract.events.TransactionCompleted({ filter: { transactionHash } }, (error, event) => {
-    if (error) {
-      console.error("Error listening for transaction completion:", error);
-    } else {
-      console.log("Transaction completed event:", event);
-    }
-  });
-};
-
-// Helper function to derive transaction ID from hash using blockchain events
-const deriveTransactionIdFromHash = async (hash) => {
-  try {
-    // Query past events to find the transaction ID associated with this hash
-    const events = await escrowContract.getPastEvents('AssetPurchased', {
-      fromBlock: 0,
-      toBlock: 'latest'
-    });
-    
-    // Find the event that matches our transaction hash
-    // This is a simplified approach - in production, you'd need more robust logic
-    const matchingEvent = events.find(event => event.transactionHash === hash);
-    
-    if (matchingEvent && matchingEvent.returnValues.transactionId) {
-      return matchingEvent.returnValues.transactionId;
-    }
-    
-    throw new Error("Could not find transaction ID from hash using AssetPurchased event");
-  } catch (error) {
-    console.error("Error deriving transaction ID from hash:", error);
-    throw new Error("Failed to derive transaction ID: " + error.message);
-  }
-};
-// Complete a transaction
-export const completeTransaction = async (transactionId) => {
-  if (!escrowContract) await initWeb3();
+// Mint an NFT to a recipient with a given tokenURI and sale price (in wei)
+export const mintNFT = async (recipient, tokenURI, price) => {
+  if (!nftContract) await initWeb3();
   const account = await getCurrentAccount();
 
   try {
-    // If transactionId is a transaction hash, we need to get the actual transaction ID
-    if (transactionId && transactionId.startsWith("0x")) {
-      console.log("Transaction hash provided. Listening for completion...");
-      listenForTransactionCompletion(transactionId);
-      
-      // Derive the actual transaction ID from blockchain events
-      transactionId = await deriveTransactionIdFromHash(transactionId);
-      console.log("Derived transaction ID:", transactionId);
-    }
-
-    if (!transactionId) {
-      throw new Error("Valid transaction ID is required to complete the transaction.");
-    }
-
-    console.log("Completing transaction with ID:", transactionId);
-    return escrowContract.methods.completeTransaction(transactionId).send({ from: account });
+    // Send transaction to mint NFT with the provided sale price
+    const receipt = await nftContract.methods.mintNFT(recipient, tokenURI, price).send({ from: account });
+    console.log("Mint NFT transaction receipt:", receipt);
+    return receipt;
   } catch (error) {
-    console.error("Error during completion of transaction:", error);
-    throw new Error("MetaMask RPC transaction failure: " + error.message);
+    console.error("Error minting NFT:", error);
+    throw error;
   }
-}
+};
 
-// Cancel a transaction
-export const cancelTransaction = async (transactionId) => {
-  if (!escrowContract) await initWeb3()
-  const account = await getCurrentAccount()
-
+// Retrieve the token URI for a given token ID
+export const getTokenURI = async (tokenId) => {
+  if (!nftContract) await initWeb3();
   try {
-    // If transactionId is a transaction hash, derive the actual ID
-    if (transactionId && transactionId.startsWith("0x")) {
-      transactionId = await deriveTransactionIdFromHash(transactionId);
-      console.log("Derived transaction ID for cancellation:", transactionId);
-    }
-
-    if (!transactionId) {
-      throw new Error("Valid transaction ID is required to cancel the transaction.");
-    }
-
-    return escrowContract.methods.cancelTransaction(transactionId).send({ from: account });
+    const uri = await nftContract.methods.tokenURI(tokenId).call();
+    console.log(`Token URI for token ${tokenId}:`, uri);
+    return uri;
   } catch (error) {
-    console.error("Error during cancellation of transaction:", error);
-    throw new Error("MetaMask RPC transaction failure: " + error.message);
+    console.error("Error fetching token URI:", error);
+    throw error;
   }
-} 
+};
+
+// Get the owner of a specific token
+export const getTokenOwner = async (tokenId) => {
+  if (!nftContract) await initWeb3();
+  try {
+    const owner = await nftContract.methods.ownerOf(tokenId).call();
+    return owner;
+  } catch (error) {
+    console.error("Error fetching token owner:", error);
+    throw error;
+  }
+};
+
+// Get the total supply of tokens
+export const getTotalSupply = async () => {
+  if (!nftContract) await initWeb3();
+  try {
+    const totalSupply = await nftContract.methods.totalSupply().call();
+    return totalSupply;
+  } catch (error) {
+    console.error("Error fetching total supply:", error);
+    throw error;
+  }
+};
+
+// Get all tokens owned by an address
+export const getTokensOfOwner = async (ownerAddress) => {
+  if (!nftContract) await initWeb3();
+  try {
+    const balance = await nftContract.methods.balanceOf(ownerAddress).call();
+    const tokens = [];
+    
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await nftContract.methods.tokenOfOwnerByIndex(ownerAddress, i).call();
+      tokens.push(tokenId);
+    }
+    
+    return tokens;
+  } catch (error) {
+    console.error("Error fetching tokens of owner:", error);
+    throw error;
+  }
+};
+
+// Transfer an NFT from one owner to another
+export const transferNFT = async (from, to, tokenId) => {
+  if (!nftContract) await initWeb3();
+  const account = await getCurrentAccount();
+  try {
+    // Call safeTransferFrom method from ERC721 standard
+    const receipt = await nftContract.methods.safeTransferFrom(from, to, tokenId)
+      .send({ from: account });
+    console.log("Transfer NFT receipt:", receipt);
+    return receipt;
+  } catch (error) {
+    console.error("Error transferring NFT:", error);
+    throw error;
+  }
+};
+
+// Purchase an NFT by calling the appropriate function on the contract.
+// This function will try the "purchaseNFT" method first, and if that's not available,
+// it will attempt "purchaseAsset". The buyer sends the salePrice in wei along with the transaction.
+export const purchaseAsset = async (tokenId, salePrice) => {
+  if (!nftContract) await initWeb3();
+  const buyer = await getCurrentAccount();
+  
+  // Determine which method name is available on the contract
+  let methodName = null;
+  if (typeof nftContract.methods.purchaseNFT === "function") {
+    methodName = "purchaseNFT";
+  } else if (typeof nftContract.methods.purchaseAsset === "function") {
+    methodName = "purchaseAsset";
+  } else {
+    throw new Error("Neither purchaseNFT nor purchaseAsset methods are available on the contract instance");
+  }
+  
+  try {
+    console.log(`Calling contract method ${methodName} with tokenId: ${tokenId} and value: ${salePrice}`);
+    
+    // Create method object for reuse
+    const method = nftContract.methods[methodName](tokenId);
+    
+    // Estimate gas for the call
+    let gasEstimate;
+    try {
+      gasEstimate = await method.estimateGas({ from: buyer, value: salePrice });
+      console.log(`Gas estimate for method ${methodName} on token ${tokenId}: ${gasEstimate}`);
+      // Add a 10% buffer to gas estimate
+      const gasWithBuffer = Math.ceil(gasEstimate * 1.1);
+      const receipt = await method.send({ from: buyer, value: salePrice, gas: gasWithBuffer });
+      console.log("Purchase asset receipt:", receipt);
+      return receipt;
+    } catch (gasError) {
+      console.error("Gas estimation failed:", gasError);
+      if (gasError.message && gasError.message.includes("execution reverted")) {
+        throw new Error(`Transaction would fail (reverted): ${gasError.message}`);
+      }
+      console.warn("Attempting transaction without manual gas estimation");
+      const receipt = await method.send({ from: buyer, value: salePrice });
+      console.log("Purchase asset receipt:", receipt);
+      return receipt;
+    }
+  } catch (error) {
+    console.error("Error purchasing asset:", error.message || error);
+    if (error.code && error.message) {
+      console.error(`JSON-RPC Error Code: ${error.code}`);
+      console.error(`Error Details: ${JSON.stringify(error)}`);
+    }
+    throw error;
+  }
+};
 export default {
   initWeb3,
   getCurrentAccount,
-  listAsset,
+  mintNFT,
+  getTokenURI,
+  getTokenOwner,
+  getTotalSupply,
+  getTokensOfOwner,
+  transferNFT,
   purchaseAsset,
-  completeTransaction,
-  cancelTransaction,
+  get web3() {
+    // Expose the underlying web3 instance for utility methods (like toWei)
+    return web3
+  }
 }
 

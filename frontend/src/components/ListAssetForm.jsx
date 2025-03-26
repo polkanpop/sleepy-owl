@@ -15,7 +15,7 @@ import {
   Snackbar,
 } from "@mui/material"
 import { assetsApi } from "../services/api"
-import web3Service from "../services/web3"
+import web3 from "../services/web3" // Updated import to match the file name
 
 const categories = [
   "Art",
@@ -65,16 +65,27 @@ function ListAssetForm({ onSuccess }) {
         throw new Error("Price must be a positive number")
       }
 
-      // First, list the asset on the blockchain
-      console.log("Listing asset on blockchain...")
-      const account = await web3Service.getCurrentAccount()
-
-      const blockchainResult = await web3Service.listAsset(formData.name, price)
-
-      console.log("Blockchain listing result:", blockchainResult)
-
+      // First, mint the NFT on the blockchain
+      console.log("Minting NFT on blockchain...")
+      
+      // Retrieve current account
+      const account = await web3.getCurrentAccount()
+      
+      // Use the image_url as the tokenURI or provide a default
+      const tokenURI = formData.image_url || "https://example.com/default-token-uri.json"
+      
+      // Convert the price from ETH to wei using the web3 instance's utility
+      const weiPrice = web3.web3.utils.toWei(formData.price.toString(), "ether")
+      
+      // Pass the sale price (in wei) when minting NFT
+      const blockchainResult = await web3.mintNFT(account, tokenURI, weiPrice)
+      console.log("Blockchain mintNFT result:", blockchainResult)
+      
       // Get the token ID from the blockchain result
-      const tokenId = blockchainResult.events.AssetListed.returnValues.assetId
+      // Check for either AssetMinted or Transfer event based on contract implementation
+      const tokenId = blockchainResult.events.AssetMinted
+        ? blockchainResult.events.AssetMinted.returnValues.assetId
+        : blockchainResult.events.Transfer.returnValues.tokenId
 
       // Then, create the asset in the database
       const assetData = {
