@@ -44,7 +44,7 @@ def setup_frontend():
         print("❌ Failed to install frontend dependencies")
         return False
     
-    print("✅ Frontend setup completed")
+    print("Frontend setup completed")
     return True
 
 def setup_smart_contracts():
@@ -58,10 +58,10 @@ def setup_smart_contracts():
     # Install dependencies
     print("Installing smart contract dependencies...")
     if not run_command("npm install", cwd=contracts_dir):
-        print("❌ Failed to install smart contract dependencies")
+        print(" Failed to install smart contract dependencies")
         return False
     
-    print("✅ Smart contracts setup completed")
+    print("Smart contracts setup completed")
     return True
 
 def main():
@@ -91,7 +91,7 @@ Next steps:
 """)
         return True
     else:
-        print("\n❌ Setup failed. Please check the errors above.")
+        print("\nSetup failed. Please check the errors above.")
         return False
 
 if __name__ == "__main__":
