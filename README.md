@@ -1,4 +1,4 @@
-# Mememonize Trading Platform
+# Sleepy Owl Trading Platform
 A decentralized trading system for digital assets.
 
 ## Prerequisites
@@ -8,6 +8,7 @@ A decentralized trading system for digital assets.
 - MySQL
 - Ganache (for local blockchain)
 - Anaconda
+
 ## Backend dependencies
 - Anaconda (Manage packages and environments)
 - FastAPI
@@ -18,17 +19,21 @@ A decentralized trading system for digital assets.
 Using Anaconda, please install the dependencies to your anaconda virtual environment.
 
 ### Anaconda Setup
-
-You can import the "mememonize-env.yaml" environment to anaconda and 
+If you are using Anaconda Navigator,  
+You can import the "mememonize-env.yaml" environment and 
 activate the virtual environment. The .yaml file already has all the dependencies installed.
+
+If you are not using Anaconda Navigator, please manually install all Backend dependencies.
 
 ### Run the setup script
 
 ```python setup.py```
 
+This script will install and setup all front-end and smart contract dependencies.
+
 ### Database setup
 
-Then edit your the backend/.env to your MySQL credentials
+Edit your `backend/.env` to your MySQL credentials
 ```DATABASE_URL=mysql+pymysql://root:password@localhost/mememonize```
 
 ```root```: Your username   
@@ -39,14 +44,16 @@ Make sure that your MySQL service is running and you are in the "mememonize-env"
 ```cd backend ```
 ```python init_db.py```
 
+This setup script will setup the database for the system.
 ### Start Ganache UI:
-Start the Ganache UI 
-New workspace and import the truffle.config file in /smart-contracts
+Start the Ganache UI  
+Create a New Workspace and import the truffle.config file in `/smart-contracts`
 ### Deploy smart contracts: 
 ```cd smart-contracts && truffle migrate```
     - Change the "CONTRACT_ADDRESS" variable in .env to the contract address after truffle migrate.
 ### Start backend (after activating anaconda virtual environment): 
-```python event_listener.py```
+```python event_listener.py```  
+and  
 ```uvicorn main:app --reload```
 ### Start frontend: 
 ```cd frontend && npm run dev```
@@ -77,4 +84,7 @@ Add two or more accounts to Meta Mask
 
 
 Everything should work according to the video Demo now.
+
+### Video Demo:
+
 

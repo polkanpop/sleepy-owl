@@ -17,7 +17,7 @@ def init_db():
     load_dotenv()
     
     # Get database URL from environment
-    DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/mememonize")
+    DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/SleepyOwl")
     
     try:
         # Extract database name from URL

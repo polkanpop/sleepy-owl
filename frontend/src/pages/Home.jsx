@@ -47,7 +47,7 @@ function Home() {
       {/* Features Section */}
       <Container maxWidth="lg" sx={{ mb: 6 }}>
         <Typography variant="h3" component="h2" align="center" gutterBottom>
-          Why Choose Mememonize Trading?
+          Why Choose Sleepy Owl Trading?
         </Typography>
         <Grid container spacing={4} sx={{ mt: 2 }}>
           <Grid item xs={12} md={4}>

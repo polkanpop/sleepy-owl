@@ -66,7 +66,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            Mememonize Trading
+            Sleepy Owl Trading
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -121,7 +121,7 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            Mememonize
+            Sleepy Owl
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (

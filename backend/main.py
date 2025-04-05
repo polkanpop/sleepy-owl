@@ -13,7 +13,7 @@ from routers import assets, transactions, search, contract, users
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Mememonize Trading API")
+app = FastAPI(title="Sleepy Owl Trading API")
 
 # Define allowed origins
 origins = [
@@ -42,7 +42,7 @@ app.include_router(users.router, prefix="/api/users", tags=["users"])
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Mememonize Trading API"}
+    return {"message": "Welcome to Sleepy Owl Trading API"}
 
 @app.get("/api/health")
 def health_check():

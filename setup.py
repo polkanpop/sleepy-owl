@@ -66,7 +66,7 @@ def setup_smart_contracts():
 
 def main():
     """Set up the entire project."""
-    print("Setting up Mememonize Trading Platform...")
+    print("Setting up Sleepy Owl Trading Platform...")
     
     # Setup components
     frontend_ok = setup_frontend()

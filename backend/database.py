@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database connection
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/mememonize")
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/SleepyOwl")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

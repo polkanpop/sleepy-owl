@@ -8,7 +8,7 @@ router = APIRouter()
 @router.get("/")
 def get_contract_address():
     try:
-        # Path to contract JSON file for MememonizeNFT
+        # Path to contract JSON file for MememonizeNFT of the SleepyOwl trading platform
         contract_path = Path(__file__).parent.parent.parent / "smart-contracts" / "build" / "contracts" / "MememonizeNFT.json"
         
         if not contract_path.exists():

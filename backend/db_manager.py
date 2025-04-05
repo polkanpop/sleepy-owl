@@ -15,7 +15,7 @@ def load_db_config():
     load_dotenv()
     
     # Get database URL from environment
-    db_url = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/mememonize")
+    db_url = os.getenv("DATABASE_URL", "mysql+pymysql://root:password@localhost/SleepyOwl")
     
     # Parse the database URL
     # Format: mysql+pymysql://username:password@host/database

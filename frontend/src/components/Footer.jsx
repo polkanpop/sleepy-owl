@@ -7,7 +7,7 @@ function Footer() {
         <Grid container spacing={4} justifyContent="space-between">
           <Grid item xs={12} sm={4}>
             <Typography variant="h6" color="text.primary" gutterBottom>
-              Mememonize Trading
+              Sleepy Owl Trading Platform
             </Typography>
             <Typography variant="body2" color="text.secondary">
               A decentralized trading platform for digital assets.
@@ -18,7 +18,7 @@ function Footer() {
               Contact Us
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Email: support@mememonize.com
+              Email: support@sleepyowl.com
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Phone: +1 (123) 456-7890
@@ -29,7 +29,7 @@ function Footer() {
         <Typography variant="body2" color="text.secondary" align="center">
           {"© "}
           {new Date().getFullYear()}
-          {" Mememonize Trading. All rights reserved."}
+          {" Sleepy Owl Trading. All rights reserved."}
         </Typography>
       </Container>
     </Box>
